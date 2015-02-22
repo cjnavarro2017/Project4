@@ -27,6 +27,7 @@ struct Page{
 	int allocated; //is page allocated
 	int location; //where is the page: 0 - Memory, 1 - SSD, 2 - Harddrive, -1 - Non-existent
 	int counter; //increments with every memory access
+	double timeAccessed; // records last time page was accessed
 	};
 	
 
