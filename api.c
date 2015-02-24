@@ -123,24 +123,42 @@ vAddr evictRAM1(int memory){
 	//NEED to handle shifting the evicted page down
 	int loc = table[min].location;
 	
-	//do i need a lock here
-	copy_to_SSD1(&table[min]);
+	//do i need a lock here, yes you do Chris, yes you do
+	if (copy_to_SSD1(&table[min]) == -1) {
+        printf("NO ROOM IN SSD, attempting to copy to hard drive\n");
+	    if (copy_to_DISK1(&table[min]) == -1) {
+	        printf("NO MORE ROOM IN DISK");
+	    }
+	};
 	
 	return loc;
 	
 }
 
-void copy_to_SSD1(struct Page *page){
+unsigned int copy_to_SSD1(struct Page *page){
 	int i;
 	for(i=0; i<SSD_SIZE; i++){
 		if(ssd[i] == 0){
 			ssd[i] = 1;
 			page->location = i + RAM_SIZE;
-			return;
+			return 0;
 		}
 	}
-	printf("NO ROOM IN SSD\n");
-	return;
+	//printf("NO ROOM IN SSD\n");
+	return -1;
+}
+
+unsigned int copy_to_DISK1(struct Page *page){
+	int i;
+	for(i=0; i<DISK_SIZE; i++){
+		if(disk[i] == 0){
+			disk[i] = 1;
+			page->location = i + RAM_SIZE;
+			return 0;
+		}
+	}
+	//printf("NO ROOM IN SSD\n");
+	return -1;
 }
 
 //first eviction algorithm

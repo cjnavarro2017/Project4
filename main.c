@@ -30,11 +30,11 @@ int main(int argc, char *argv[]){
 	//=====Tests======
 	int i;
 	vAddr index[100];
-	for(i =0; i<26;i++){
+	for(i =0; i<25;i++){
 		printf("Allocating Memory for index %d\n", i);
 		index[i] = allocateNewInt();
 	}
-	for(i =0; i<26;i++){
+	for(i =0; i<25;i++){
 		printPage(table[i]);
 	}
 

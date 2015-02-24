@@ -60,7 +60,8 @@ void freeMemory(vAddr address);
 void init_arrays();
 vAddr findPage();
 void printPage();
-void copy_to_SSD1(struct Page *page);
+unsigned int copy_to_SSD1(struct Page *page);
+unsigned int copy_to_DISK1(struct Page *page);
 vAddr evictRAM1(int memory);
 vAddr evictRAM2();
 
