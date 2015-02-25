@@ -31,7 +31,7 @@ vAddr allocateNewInt(){
 			ram[i] = 1;
 			address = i;
 			table[newPage].allocated = 1;
-			table[newPage].location = address;
+			table[newPage].location = 0;
 			table[newPage].counter++;
 			table[newPage].timeAccessed = difftime(time(0), start);
 			return newPage;
@@ -140,7 +140,7 @@ unsigned int copy_to_SSD1(struct Page *page){
 	for(i=0; i<SSD_SIZE; i++){
 		if(ssd[i] == 0){
 			ssd[i] = 1;
-			page->location = i + RAM_SIZE;
+			page->location = 1;
 			return 0;
 		}
 	}
@@ -153,7 +153,7 @@ unsigned int copy_to_DISK1(struct Page *page){
 	for(i=0; i<DISK_SIZE; i++){
 		if(disk[i] == 0){
 			disk[i] = 1;
-			page->location = i + RAM_SIZE;
+			page->location = 2;
 			return 0;
 		}
 	}
