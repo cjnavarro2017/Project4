@@ -166,3 +166,34 @@ vAddr evictRAM2(){
 	return 0;
 	
 }
+
+int * accessIntPtr (vAddr address) {
+	table[address].lock = 1;
+	
+	int location = table[address].location ;
+	int loc_index = table[address].indx;
+	
+	switch(location) {
+		case 0:
+			if(ram[loc_index]) {
+				return table[address].indx;
+			}
+			break;
+		case 1:
+			if(ssd[loc_index]) {
+				return table[address].indx;
+			}
+			break;
+		case 2:
+			if(disk[loc_index]) {
+				return table[address].indx;
+			}
+			break;
+	}
+	
+	return NULL;
+}
+
+void unlockMemory (vAddr address) {
+	table[address].lock = 0;
+}
