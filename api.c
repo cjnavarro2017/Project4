@@ -203,7 +203,7 @@ void unlockMemory (vAddr address) {
 }
 
 void freeMemory(vAddr address){
-	if(table[address].lock = 0){
+	if(table[address].lock == 0){
         int location = table[address].location;
 		//in ram
         switch(location) {
@@ -220,7 +220,7 @@ void freeMemory(vAddr address){
             table[address].location = -1;
             break;
         }
-        printf("Address is freed!\n")
+        printf("Address is freed!\n");
 	}
 	else{
 		printf("Attempting to free a locked page!\n");
