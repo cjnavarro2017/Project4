@@ -202,16 +202,19 @@ void freeMemory(vAddr address){
 	if(table[address].lock = 0){
 		//in ram
 		if(table[address].location < 25 && table[address].location >= 0){
-			ram[table[address].location] = 0;
+			ram[table[address].indx] = 0;
+			table[address].location = -1;
 		}
 		//in ssd
 		else if(table[address].location < 125 && table[address].location >= 25){
-			ram[table[address].location - 25] = 0;
+			ram[table[address].indx - 25] = 0;
+			table[address].location = -1;
 			
 		}
 		//in disk
 		else if(table[address].location < 1125 && table[address].location >= 125){
-			ram[table[address].location - 125] = 0;
+			ram[table[address].indx - 125] = 0;
+			table[address].location = -1;
 		}
 		else{
 			printf("Trying to free memory with invalid address!\n");
