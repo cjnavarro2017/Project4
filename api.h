@@ -57,6 +57,12 @@ int * accessIntPtr(vAddr address);
 void unlockMemory(vAddr address);
 void freeMemory(vAddr address);
 
+vAddr lru_evict(int memory);
+vAddr lfu_evict(int memory);
+void swap_to_disk(int value, vAddr *address);
+void swap_to_ssd(int value, vAddr *address);
+void swap_to_ram(int value, vAddr *address);
+
 void init_arrays();
 vAddr findPage();
 void printPage();

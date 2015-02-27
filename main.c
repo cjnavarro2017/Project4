@@ -12,6 +12,20 @@
 #include "api.h"
 
 
+void memoryMaxer() {
+vAddr indexes[1000];
+for (int i = 0; i < 1000; ++i) {
+indexes[i] = allocateNewInt();
+printf("allocated\n");
+int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
+unlockMemory(indexes[i]);
+printf("accessed value\n");
+}
+// for (int i = 0; i < 26; ++i) {
+//       freeMemory(indexes[i]);
+//    }
+}
+
 int main(int argc, char *argv[]){
 	//start clock
 	start = time(0);
@@ -28,13 +42,16 @@ int main(int argc, char *argv[]){
 	//inits memory arrays to zero
 	init_arrays();
 	//=====Tests======
-	int i;
-	vAddr index[100];
-	for(i =0; i<25;i++){
-		printf("Allocating Memory for index %d\n", i);
-		index[i] = allocateNewInt();
-	}
-	for(i =0; i<25;i++){
+	 int i;
+	// vAddr index[100];
+	// for(i =0; i<26;i++){
+	// 	printf("Allocating Memory for index %d\n", i);
+	// 	index[i] = allocateNewInt();
+	// }
+	
+	memoryMaxer();
+	
+	for(i =0; i<26;i++){
 		printPage(table[i]);
 	}
 
