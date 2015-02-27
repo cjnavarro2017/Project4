@@ -32,6 +32,7 @@ vAddr allocateNewInt(){
 			address = i;
 			table[newPage].allocated = 1;
 			table[newPage].location = 0;
+            table[newPage].indx = i;
 			table[newPage].counter++;
 			table[newPage].timeAccessed = difftime(time(0), start);
 			return newPage;
@@ -141,6 +142,7 @@ unsigned int copy_to_SSD1(struct Page *page){
 		if(ssd[i] == 0){
 			ssd[i] = 1;
 			page->location = 1;
+            page->indx = i;
 			return 0;
 		}
 	}
@@ -154,6 +156,7 @@ unsigned int copy_to_DISK1(struct Page *page){
 		if(disk[i] == 0){
 			disk[i] = 1;
 			page->location = 2;
+            page->indx = i;
 			return 0;
 		}
 	}
@@ -195,33 +198,31 @@ int * accessIntPtr (vAddr address) {
 }
 
 void unlockMemory (vAddr address) {
+    //function incomplete, I think we have to move it to RAM before anything else.
 	table[address].lock = 0;
 }
 
 void freeMemory(vAddr address){
 	if(table[address].lock = 0){
+        int location = table[address].location;
 		//in ram
-		if(table[address].location < 25 && table[address].location >= 0){
-			ram[table[address].indx] = 0;
-			table[address].location = -1;
-		}
-		//in ssd
-		else if(table[address].location < 125 && table[address].location >= 25){
-			ram[table[address].indx - 25] = 0;
-			table[address].location = -1;
-			
-		}
-		//in disk
-		else if(table[address].location < 1125 && table[address].location >= 125){
-			ram[table[address].indx - 125] = 0;
-			table[address].location = -1;
-		}
-		else{
-			printf("Trying to free memory with invalid address!\n");
-			exit(0);
-		}
+        switch(location) {
+            case 0:
+            ram[table[address].indx] = 0;
+            table[address].location = -1;
+            break;
+            case 1:
+            ssd[table[address].indx] = 0;
+            table[address].location = -1;
+            break;
+            case 2:
+            disk[table[address].indx] = 0;
+            table[address].location = -1;
+            break;
+        }
+        printf("Address is freed!\n")
 	}
 	else{
-		printf("Attempting to free a locked page!");
+		printf("Attempting to free a locked page!\n");
 	}
 }
