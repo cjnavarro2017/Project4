@@ -197,3 +197,28 @@ int * accessIntPtr (vAddr address) {
 void unlockMemory (vAddr address) {
 	table[address].lock = 0;
 }
+
+void freeMemory(vAddr address){
+	if(table[address].lock = 0){
+		//in ram
+		if(table[address].location < 25 && table[address].location >= 0){
+			ram[table[address].location] = 0;
+		}
+		//in ssd
+		else if(table[address].location < 125 && table[address].location >= 25){
+			ram[table[address].location - 25] = 0;
+			
+		}
+		//in disk
+		else if(table[address].location < 1125 && table[address].location >= 125){
+			ram[table[address].location - 125] = 0;
+		}
+		else{
+			printf("Trying to free memory with invalid address!\n");
+			exit(0);
+		}
+	}
+	else{
+		printf("Attempting to free a locked page!");
+	}
+}
