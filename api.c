@@ -45,20 +45,20 @@ int * accessIntPtr (vAddr address) {
 			return &ram[loc_index];
 			break;
 		case 1:
-			swap_to_ram(ssd[loc_index], &address);
+			swap_to_ram(ssd[loc_index], address);
 			sleep(1);
-			accessIntPtr(&address);
+			//accessIntPtr(address);
 			break;
 		case 2:
-			swap_to_disk(disk[loc_index], &address);
-			accessIntPtr(&address);
+			swap_to_disk(disk[loc_index], address);
+			//accessIntPtr(address);
 			break;
 	}
 	
 	return NULL;
 }
 
-void swap_to_ram(int value, vAddr *address){
+void swap_to_ram(int value, vAddr address){
 	int i,flag;
 	int victim;
 	int temp;
@@ -68,8 +68,8 @@ void swap_to_ram(int value, vAddr *address){
 		if(ram[i] == -1){
 			usleep(250);
 			ram[i] = value;
-			table[&address].location = 0;
-			table[&address].indx = i;
+			table[address].location = 0;
+			table[address].indx = i;
 			flag = 0;
 			break;
 		}
@@ -83,8 +83,8 @@ void swap_to_ram(int value, vAddr *address){
 			
 			temp = ram[table[victim].indx];
 			
-			temp = table[&address].location;
-			table[&address].location = table[victim].location;
+			temp = table[address].location;
+			table[address].location = table[victim].location;
 			table[victim].location = temp;
 			
 			//temp = table[address].indx;
@@ -92,7 +92,7 @@ void swap_to_ram(int value, vAddr *address){
 			//table[victim].indx = temp;
 			
 			temp = ram[table[address].indx];
-			ram[table[&address].indx] = ram[table[victim].indx];
+			ram[table[address].indx] = ram[table[victim].indx];
 			ram[table[victim].indx] = temp;
 					
 		}
@@ -105,7 +105,7 @@ void swap_to_ram(int value, vAddr *address){
 	
 }
 
-void swap_to_ssd(int value, vAddr *address){
+void swap_to_ssd(int value, vAddr address){
 	int i,flag, temp;
 	vAddr victim;
 	flag = 1;
@@ -114,8 +114,8 @@ void swap_to_ssd(int value, vAddr *address){
 		if(ssd[i] == -1){
 			usleep(250);
 			ssd[i] = value;
-			table[&address].location = 1;
-			table[&address].indx = i;
+			table[address].location = 1;
+			table[address].indx = i;
 			flag = 0;
 			break;
 		}
@@ -130,8 +130,8 @@ void swap_to_ssd(int value, vAddr *address){
 			temp = ram[table[victim].indx];
 			
 			
-			temp = table[&address].location;
-			table[&address].location = table[victim].location;
+			temp = table[address].location;
+			table[address].location = table[victim].location;
 			table[victim].location = temp;
 			
 			//temp = table[address].indx;
@@ -139,7 +139,7 @@ void swap_to_ssd(int value, vAddr *address){
 			//table[victim].indx = temp;
 			
 			temp = ssd[table[address].indx];
-			ssd[table[&address].indx] = ssd[table[victim].indx];
+			ssd[table[address].indx] = ssd[table[victim].indx];
 			ssd[table[victim].indx] = temp;
 		}
 		//LFU
@@ -151,7 +151,7 @@ void swap_to_ssd(int value, vAddr *address){
 	
 }
 
-void swap_to_disk(int value, vAddr *address){
+void swap_to_disk(int value, vAddr address){
 	int i,flag, temp;
 	vAddr victim;
 	flag = 1;
@@ -160,8 +160,8 @@ void swap_to_disk(int value, vAddr *address){
 		if(disk[i] == -1){
 			usleep(2500);
 			disk[i] = value;
-			table[&address].location = 0;
-			table[&address].indx = i;
+			table[address].location = 0;
+			table[address].indx = i;
 			flag = 0;
 			break;
 		}
@@ -176,16 +176,16 @@ void swap_to_disk(int value, vAddr *address){
 			temp = disk[table[victim].indx];
 			
 			
-			temp = table[&address].location;
-			table[&address].location = table[victim].location;
+			temp = table[address].location;
+			table[address].location = table[victim].location;
 			table[victim].location = temp;
 			
 			//temp = table[address].indx;
 			//table[address].indx = table[victim].indx;
 			//table[victim].indx = temp;
 			
-			temp = ssd[table[&address].indx];
-			disk[table[&address].indx] = disk[table[victim].indx];
+			temp = ssd[table[address].indx];
+			disk[table[address].indx] = disk[table[victim].indx];
 			disk[table[victim].indx] = temp;
 			
 		}
