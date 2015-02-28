@@ -18,7 +18,7 @@ vAddr allocateNewInt(){
 	printf("Allocating memory with virtual address: %d\n", newpage);
 	table[newpage].lock = 0;
 	table[newpage].allocated = 1;
-	table[newpage].location = 1;
+	table[newpage].location = 0;
 	table[newpage].counter = 0;
 	table[newpage].timeAccessed = 0;
 	
@@ -47,11 +47,11 @@ int * accessIntPtr (vAddr address) {
 		case 1:
 			swap_to_ram(ssd[loc_index], address);
 			sleep(1);
-			//accessIntPtr(address);
+			accessIntPtr(address);
 			break;
 		case 2:
 			swap_to_disk(disk[loc_index], address);
-			//accessIntPtr(address);
+			accessIntPtr(address);
 			break;
 	}
 	
@@ -260,10 +260,10 @@ vAddr lru_evict(int memory){
 		}
 		
 	}
-	if(max == -1){
-		printf("NO ROOM, FULL");
-		exit(0);
-	}
+	// if(max == -1){
+	// 	printf("NO ROOM, FULL");
+	// 	exit(0);
+	// }
 	return max;
 }
 
@@ -278,7 +278,7 @@ vAddr lfu_evict(int memory){
 				min = i;
 			}
 			else{
-				if(table[i].count <  table[min].count){
+				if(table[i].counter <  table[min].counter){
 					min = i;
 				}
 			}	

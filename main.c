@@ -15,11 +15,13 @@
 void memoryMaxer() {
 vAddr indexes[1000];
 for (int i = 0; i < 1000; ++i) {
-indexes[i] = allocateNewInt();
-printf("allocated\n");
-int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
-unlockMemory(indexes[i]);
-printf("accessed value\n");
+	indexes[i] = allocateNewInt();
+	printf("allocated\n");
+	printPage(table[i]);
+	//int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
+	unlockMemory(indexes[i]);
+	printPage(table[i]);
+	printf("accessed value\n");
 }
 // for (int i = 0; i < 26; ++i) {
 //       freeMemory(indexes[i]);
