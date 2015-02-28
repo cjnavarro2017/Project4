@@ -81,7 +81,7 @@ void swap_to_ram(int value, vAddr address){
 			usleep(250);
 			victim = lru_evict(0);
 			
-			temp = ram[table[victim].indx];
+			//tempval = ram[table[victim].indx];
 			
 			temp = table[address].location;
 			table[address].location = table[victim].location;
@@ -127,7 +127,7 @@ void swap_to_ssd(int value, vAddr address){
 			usleep(250);
 			victim = lru_evict(1);
 			
-			temp = ram[table[victim].indx];
+			//temp = ram[table[victim].indx]; < no
 			
 			
 			temp = table[address].location;
@@ -173,7 +173,7 @@ void swap_to_disk(int value, vAddr address){
 			usleep(2500);
 			victim = lru_evict(2);
 			
-			temp = disk[table[victim].indx];
+			//temp = disk[table[victim].indx]; < stop
 			
 			
 			temp = table[address].location;

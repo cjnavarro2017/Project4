@@ -18,7 +18,7 @@ for (int i = 0; i < 1000; ++i) {
 	indexes[i] = allocateNewInt();
 	printf("allocated\n");
 	printPage(table[i]);
-	//int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
+	int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
 	unlockMemory(indexes[i]);
 	printPage(table[i]);
 	printf("accessed value\n");
@@ -53,9 +53,9 @@ int main(int argc, char *argv[]){
 	
 	memoryMaxer();
 	
-	for(i =0; i<26;i++){
-		printPage(table[i]);
-	}
+	// for(i =0; i<26;i++){
+// 		printPage(table[i]);
+// 	}
 
 	return 0;
 } 
