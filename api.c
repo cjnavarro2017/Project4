@@ -245,26 +245,26 @@ void freeMemory(vAddr address){
 //lru
 vAddr lru_evict(int memory){
 	int i;
-	vAddr min = -1;
+	vAddr max = -1;
 	
 	for(i = 0; i < PAGE_TABLE; i++){
 		if(table[i].location == memory && table[i].lock == 0){
-			if(min == -1){
-				min = i;
+			if(max == -1){
+				max = i;
 			}
 			else{
-				if(table[i].timeAccessed > table[min].timeAccessed){
-					min = i;
+				if(table[i].timeAccessed > table[max].timeAccessed){
+					max = i;
 				}
 			}	
 		}
 		
 	}
-	if(min == -1){
+	if(max == -1){
 		printf("NO ROOM, FULL");
 		exit(0);
 	}
-	return min;
+	return max;
 }
 
 //lru
@@ -278,7 +278,7 @@ vAddr lfu_evict(int memory){
 				min = i;
 			}
 			else{
-				if(table[i].timeAccessed <  table[min].timeAccessed){
+				if(table[i].count <  table[min].count){
 					min = i;
 				}
 			}	
