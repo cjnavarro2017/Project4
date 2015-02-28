@@ -11,14 +11,25 @@
 #include <sys/time.h>
 #include "api.h"
 
+int check_lock(void) {
+	int i;
+	for (i=0; i < PAGE_TABLE; i++) {
+		if(table[i].location == 0 && table[i].lock == 0){
+			return 1;
+		}
+	}
+	return 0;
+}
+
 vAddr allocateNewInt(){
 	vAddr newpage;
 	newpage = findPage();
 	usleep(250);
 	printf("Allocating memory with virtual address: %d\n", newpage);
-	table[newpage].lock = 0;
+	table[newpage].lock = 1;
+	table[newpage].indx = -1;
 	table[newpage].allocated = 1;
-	table[newpage].location = 0;
+	table[newpage].location = 9;
 	table[newpage].counter = 0;
 	table[newpage].timeAccessed = 0;
 	
@@ -31,32 +42,46 @@ int * accessIntPtr (vAddr address) {
 	table[address].lock = 1;
 	struct timeval tv;
 	
-	printf("Accesssing adress: %d\n", address);
+	printf("Accesssing address: %d\n", address);
 	
 	int location = table[address].location ;
 	int loc_index = table[address].indx;
 	
 	gettimeofday(&tv,NULL);
 	
-	table[address].timeAccessed = tv.tv_sec;
-	
+
+	//if (check_lock()) {
 	switch(location) {
 		case 0:
+			table[address].timeAccessed = tv.tv_usec;
 			return &ram[loc_index];
 			break;
 		case 1:
+			table[address].timeAccessed = tv.tv_usec;
 			swap_to_ram(ssd[loc_index], address);
-			sleep(1);
-			accessIntPtr(address);
+			location = table[address].location ;
+			loc_index = table[address].indx;
+			return &ram[loc_index];
 			break;
+			//sleep(1);
+			//accessIntPtr(address);
 		case 2:
+			table[address].timeAccessed = tv.tv_usec;
 			swap_to_disk(disk[loc_index], address);
-			accessIntPtr(address);
+			location = table[address].location;
+			loc_index = table[address].indx;
+			swap_to_ram(ssd[loc_index], address);
+			location = table[address].location;
+			loc_index = table[address].indx;
+			return &ram[loc_index];			
+			
+			//accessIntPtr(address);
 			break;
 	}
-	
+	//}
 	return NULL;
 }
+
 
 void swap_to_ram(int value, vAddr address){
 	int i,flag;
@@ -66,35 +91,41 @@ void swap_to_ram(int value, vAddr address){
 	//check if room
 	for(i = 0; i < RAM_SIZE; i++){
 		if(ram[i] == -1){
+			printf("going through for loop\n");
 			usleep(250);
 			ram[i] = value;
 			table[address].location = 0;
 			table[address].indx = i;
-			flag = 0;
-			break;
+			//flag = 0;
+			return;
 		}
 	}
 	//eviction needed
 	if(flag == 1){
+		printf("eviction needed \n");
 		//LRU
 		if(setEviction == 1){
 			usleep(250);
 			victim = lru_evict(0);
-			
-			//tempval = ram[table[victim].indx];
+			printf("chose address %i", victim);
+			if (victim != -1) {
 			
 			temp = table[address].location;
 			table[address].location = table[victim].location;
 			table[victim].location = temp;
 			
-			//temp = table[address].indx;
-			//table[address].indx = table[victim].indx;
-			//table[victim].indx = temp;
+			temp = table[address].indx;
+			table[address].indx = table[victim].indx;
+			table[victim].indx = temp;
 			
 			temp = ram[table[address].indx];
 			ram[table[address].indx] = ram[table[victim].indx];
 			ram[table[victim].indx] = temp;
-					
+			}
+			else {
+				printf("All pages in RAM full and locked, storing in SSD for now\n");
+				swap_to_ssd(0, address);
+			}		
 		}
 		//LFU
 		else{
@@ -202,39 +233,39 @@ void swap_to_disk(int value, vAddr address){
 
 //unlocks page indicating it can be swapped
 void unlockMemory (vAddr address) {
-    //function incomplete, I think we have to move it to RAM before anything else.
-	if(table[address].location != 0){
-		printf("trying to unlock memory thats not in ram!");
-		exit(0);
-	}
 	
-	table[address].lock = 0;
+	int location = table[address].location ;
+	int loc_index = table[address].indx;
+    //function incomplete, I think we have to move it to RAM before anything else.
+		switch(location) {
+			case 0:
+				table[address].lock = 0;
+				break;
+			case 1:
+				swap_to_ram(ssd[loc_index], address);
+				table[address].lock = 0;
+				break;
+				//sleep(1);
+				//accessIntPtr(address);
+			case 2:
+				swap_to_disk(disk[loc_index], address);
+				location = table[address].location ;
+				loc_index = table[address].indx;
+				swap_to_ram(ssd[loc_index], address);
+				table[address].lock = 0;
+				//accessIntPtr(address);
+				break;
+		}
 }
 
 //user is done with memory page
 void freeMemory(vAddr address){
 	if(table[address].lock == 0){
-        int location = table[address].location;
-		//in ram
-        switch(location) {
-            case 0:
-            	ram[table[address].indx] = 0;
+            	ram[table[address].indx] = -1;
             	table[address].location = -1;
 				table[address].allocated = 0;
-            	break;
-            case 1:
-            	ssd[table[address].indx] = 0;
-            	table[address].location = -1;
-				table[address].allocated = 0;
-            	break;
-            case 2:
-            	disk[table[address].indx] = 0;
-            	table[address].location = -1;
-				table[address].allocated = 0;
-            	break;
-        }
-        printf("Address is freed!\n");
-	}
+				printf("Address is freed!\n");
+    }
 	else{
 		printf("Attempting to free a locked page!\n");
 	}
@@ -260,10 +291,10 @@ vAddr lru_evict(int memory){
 		}
 		
 	}
-	// if(max == -1){
-	// 	printf("NO ROOM, FULL");
-	// 	exit(0);
-	// }
+	 if(max == -1){
+		  	printf("NO ROOM, FULL");
+			 	exit(0);
+				 }
 	return max;
 }
 
@@ -309,7 +340,7 @@ void init_arrays(){
 		table[i].indx = i;
 		table[i].lock = 0;
 		table[i].allocated = 0;
-		table[i].location = -1; 
+		table[i].location = 9; 
 		table[i].counter = 0; 
 	}
 	
@@ -332,6 +363,6 @@ vAddr findPage(){
 
 //prints a pages information
 void printPage(struct Page page){
-	printf("=============\nPage Index: %d\nAllocated: %d\nLocation: %d\nTime Accessed: %f\n=============\n", 
+	printf("=============\n Index in Hardware: %d\nAllocated: %d\nLocation: %d\nTime Accessed: %f\n=============\n", 
 			page.indx, page.allocated, page.location, page.timeAccessed);
 }

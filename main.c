@@ -13,19 +13,24 @@
 
 
 void memoryMaxer() {
-vAddr indexes[1000];
-for (int i = 0; i < 1000; ++i) {
-	indexes[i] = allocateNewInt();
-	printf("allocated\n");
-	printPage(table[i]);
-	int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
-	unlockMemory(indexes[i]);
-	printPage(table[i]);
-	printf("accessed value\n");
-}
-// for (int i = 0; i < 26; ++i) {
-//       freeMemory(indexes[i]);
-//    }
+	vAddr indexes[30];
+	for (int i = 0; i < 30; ++i) {
+		indexes[i] = allocateNewInt();
+		printf("allocated\n");
+		//printPage(table[i]);
+		int *value = accessIntPtr(indexes[i]); *value = (i * 3); 
+		unlockMemory(indexes[i]);
+		//printPage(table[i]);
+		printf("accessed value\n");
+	}
+	for(int i =0; i<30;i++){
+		printf("INDEX %d\n", i);
+		printPage(table[i]);
+	}
+	
+	for (int i = 0; i < 30; i++) {
+		freeMemory(indexes[i]);
+	}
 }
 
 int main(int argc, char *argv[]){
@@ -44,7 +49,7 @@ int main(int argc, char *argv[]){
 	//inits memory arrays to zero
 	init_arrays();
 	//=====Tests======
-	 int i;
+	int i;
 	// vAddr index[100];
 	// for(i =0; i<26;i++){
 	// 	printf("Allocating Memory for index %d\n", i);
@@ -53,9 +58,10 @@ int main(int argc, char *argv[]){
 	
 	memoryMaxer();
 	
-	// for(i =0; i<26;i++){
-// 		printPage(table[i]);
-// 	}
+	for(i =0; i<30;i++){
+		printf("INDEX %d\n", i);
+ 		printPage(table[i]);
+	}
 
 	return 0;
 } 

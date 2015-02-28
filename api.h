@@ -29,7 +29,7 @@ struct Page{
 	int indx; //index location
 	int lock; //lock status: 0 - unlocked, 1 - locked
 	int allocated; //is page allocated: 0 - No, 1 - Yes
-	int location; //where is the page: 0 - Memory, 1 - SSD, 2 - Harddrive, -1 - Non-existent
+	unsigned int location; //where is the page: 0 - Memory, 1 - SSD, 2 - Harddrive, -1 - Non-existent
 	int counter; //increments with every memory access
 	double timeAccessed; // records last time page was accessed
 	};
